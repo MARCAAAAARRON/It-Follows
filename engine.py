@@ -186,6 +186,8 @@ class GameEngine(EventDispatcher):
             self.goal[1] = min(self.goal[1], max(TILE_SIZE, self.HEIGHT - 2*TILE_SIZE))
 
     def rects_collide(self, a, b):
+        if a is None or b is None:
+            return False
         ax, ay, aw, ah = a
         bx, by, bw, bh = b
         return (ax < bx + bw and ax + aw > bx and ay < by + bh and ay + ah > by)
@@ -256,7 +258,8 @@ class GameEngine(EventDispatcher):
             self.dispatch('on_show_overlay', "story", "Gate Unlocked!", ["OK"])
         if self.rects_collide(self.player, self.item):
             self.echo_uses += 1
-            self.dispatch('on_update_ui', f"Night {self.level}/{MAX_LEVELS}", f"Light: {self.echo_uses}", f"Time: {int(self.timer)}")
+            lives_text = "Lives: ∞" if self.lives == -1 else f"Lives: {self.lives}"
+            self.dispatch('on_update_ui', f"Night {self.level}/{MAX_LEVELS}", f"Light: {self.echo_uses}", f"Time: {int(self.timer)}", lives_text)
             self.item = self.make_rect()
             self.enemy_frozen_until = self.timer + 2.0
             self.dispatch('on_show_overlay', "story", "The shadow hesitates...", ["OK"])
@@ -434,3 +437,4 @@ class GameEngine(EventDispatcher):
             self.ui.manager.transition = NoTransition()
             self.ui.manager.current = 'menu'
             return
+
